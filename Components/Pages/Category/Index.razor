@@ -1,0 +1,27 @@
+﻿@page "/categories"
+@inject ApplicationDbContext Context
+
+<h1>Categories</h1>
+<a href="categories/create">Create New</a>
+
+<ul>
+    @foreach (var item in Categories)
+    {
+        <li>
+            @item.Title -
+            <a href="categories/edit/@item.Id">edit</a> -
+            <a href="categories/delete/@item.Id">remove</a>
+        </li>
+    }
+</ul>
+
+@code {
+
+    public IEnumerable<Category> Categories { get; set; } = Enumerable.Empty<Category>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Categories = await Context.Categories.AsNoTracking().ToListAsync();
+    }
+
+}

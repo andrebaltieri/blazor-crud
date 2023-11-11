@@ -1,0 +1,35 @@
+﻿@page "/categories/edit/{id:int}"
+@inject ApplicationDbContext Context
+@inject NavigationManager Navigation
+@attribute [RenderModeInteractiveServer]
+
+<EditForm Model="@Model" OnValidSubmit="@OnSubmitAsync">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+
+    <InputText @bind-Value="Model.Title"/>
+
+    <button class="btn btn-primary" type="submit">Update</button>
+    <a href="/categories">Cancel</a>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    public Category Model { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Context.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == Id) ?? new();
+    }
+
+    public async Task OnSubmitAsync()
+    {
+        Context.Categories.Update(Model);
+        await Context.SaveChangesAsync();
+        Navigation.NavigateTo("categories");
+    }
+
+}

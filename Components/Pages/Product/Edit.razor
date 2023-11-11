@@ -1,0 +1,44 @@
+﻿@page "/products/edit/{id:int}"
+@inject ApplicationDbContext Context
+@inject NavigationManager Navigation
+@attribute [RenderModeInteractiveServer]
+
+<EditForm Model="@Model" OnValidSubmit="@OnSubmitAsync">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+
+    <InputText @bind-Value="Model.Title"/>
+    <InputNumber @bind-Value="Model.Price"/>
+    <InputSelect @bind-Value="Model.CategoryId">
+        @foreach (var category in Categories)
+        {
+            <option value="@category.Id">@category.Title</option>
+        }
+    </InputSelect>
+
+    <button class="btn btn-primary" type="submit">Create</button>
+    <a href="/products">Cancel</a>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    public Product Model { get; set; } = new();
+    public IEnumerable<Category> Categories { get; set; } = Enumerable.Empty<Category>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Categories = await Context.Categories.AsNoTracking().ToListAsync();
+        Model = await Context.Products.FirstOrDefaultAsync(x => x.Id == Id) ?? new();
+    }
+
+    public async Task OnSubmitAsync()
+    {
+        Context.Products.Update(Model);
+        await Context.SaveChangesAsync();
+        Navigation.NavigateTo("products");
+    }
+
+}

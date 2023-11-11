@@ -1,0 +1,33 @@
+﻿@page "/categories/delete/{id:int}"
+@inject ApplicationDbContext Context
+@inject NavigationManager Navigation
+@attribute [RenderModeInteractiveServer]
+
+<h1>@Model.Title</h1>
+
+<EditForm Model="@Model" OnValidSubmit="@OnSubmitAsync">
+    Deseja excluir a categoria?
+
+    <button class="btn btn-danger" type="submit">Remove</button>
+    <a href="/categories">Cancel</a>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    public Category Model { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Context.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == Id) ?? new();
+    }
+    
+    public async Task OnSubmitAsync()
+    {
+        Context.Categories.Remove(Model);
+        await Context.SaveChangesAsync();
+        Navigation.NavigateTo("categories");
+    }
+}

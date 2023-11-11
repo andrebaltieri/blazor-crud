@@ -1,0 +1,27 @@
+﻿@page "/products"
+@inject ApplicationDbContext Context
+
+<h1>Products</h1>
+<a href="products/create">Create New</a>
+
+<ul>
+    @foreach (var item in Products)
+    {
+        <li>
+            @item.Title (@item.Category.Title) -
+            <a href="products/edit/@item.Id">edit</a> -
+            <a href="products/delete/@item.Id">remove</a>
+        </li>
+    }
+</ul>
+
+@code {
+
+    public IEnumerable<Product> Products { get; set; } = Enumerable.Empty<Product>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Products = await Context.Products.AsNoTracking().Include(x => x.Category).ToListAsync();
+    }
+
+}
